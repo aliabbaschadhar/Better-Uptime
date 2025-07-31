@@ -1,9 +1,24 @@
 import express, { response } from "express"
 import { prismaClient } from "store/client"
+import cors from "cors"
+import { authRouter } from "./auth.ts"
 
 const app = express()
 
 app.use(express.json())
+app.use(cors())
+
+// Mount the auth router
+app.use("/auth", authRouter)
+
+app.get("/", (req, res) => {
+  return res.json({
+    message: "Welcome to the Better Uptime API",
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    service: "better-uptime-api"
+  })
+})
 
 app.post("/website", async (req, res) => {
   const website = await prismaClient.website.create({
@@ -30,4 +45,6 @@ app.get("/status/:websiteId", (req, res) => {
 })
 
 
-app.listen(process.env.PORT || 8080)
+app.listen(process.env.PORT || 8080, () => {
+  console.log(`Server is running on port ${process.env.PORT || 8080}`)
+})
