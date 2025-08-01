@@ -121,7 +121,8 @@ app.post("/website", authMiddleware, async (req, res) => {
   const website = await prismaClient.website.create({
     data: {
       url: req.body.url,
-      timeAdded: new Date()
+      timeAdded: new Date(),
+      userId: req.userId!, // Assuming req.userId is set by the authMiddleware
     }
   })
   return res.json({
@@ -130,14 +131,42 @@ app.post("/website", authMiddleware, async (req, res) => {
   })
 })
 
-app.get("/status/:websiteId", authMiddleware, (req, res) => {
+app.get("/status/:websiteId", authMiddleware, async (req, res) => {
   const websiteId = req.params.websiteId
-  // Here you would typically check the status of the website with the given ID
-  // For now, we will just return a dummy status
+
+
+  if (!websiteId) {
+    return res.status(400).json({
+      message: "Website ID is required"
+    })
+  }
+
+  // Find the website by ID and userId and include the latest tick to check whether the website was up or down
+
+  const website = await prismaClient.website.findFirst({
+    where: {
+      id: websiteId,
+      userId: req.userId, // Assuming req.userId is set by the authMiddleware
+    },
+    include: {
+      ticks: {
+        orderBy: [{
+          createdAt: "desc",
+        }],
+        take: 1
+      }
+    }
+  })
+
+  if (!website) {
+    return res.status(409).json({
+      message: "Not found"
+    })
+  }
+
   return res.json({
     "msg": "On /status",
-    websiteId: websiteId,
-    status: "up" // This is a placeholder; actual status checking logic would go here
+    website: website
   })
 })
 
