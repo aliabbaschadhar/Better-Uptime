@@ -1,7 +1,7 @@
 import express from "express"
 import { prismaClient } from "store/client"
 import cors from "cors"
-import { authInput } from "./types"
+import { authInput, websiteInput } from "./types"
 import jwt from "jsonwebtoken"
 import { authMiddleware } from "./middleware"
 
@@ -118,17 +118,39 @@ app.post("/user/signin", async (req, res) => {
 
 
 app.post("/website", authMiddleware, async (req, res) => {
-  const website = await prismaClient.website.create({
-    data: {
-      url: req.body.url,
-      timeAdded: new Date(),
-      userId: req.userId!, // Assuming req.userId is set by the authMiddleware
-    }
-  })
-  return res.json({
-    "msg": "On /website",
-    id: website.id
-  })
+
+  const parsedData = websiteInput.safeParse(req.body);
+
+  if (!parsedData.success) {
+    return res.status(400).send({
+      message: "Invalid Input Data for Website",
+      Error: parsedData.error.format(),
+    });
+  }
+
+  try {
+    const website = await prismaClient.website.create({
+      data: {
+        url: parsedData.data.url,
+        timeAdded: new Date(),
+        userId: req.userId!, // Assuming req.userId is set by the authMiddleware
+      }
+    })
+
+    return res.json({
+      "msg": "On /website",
+      id: website.id
+    })
+
+  } catch (error) {
+
+    console.error("Error creating website:", error);
+    return res.status(500).send({
+      message: "Internal Server Error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+
+  }
 })
 
 app.get("/status/:websiteId", authMiddleware, async (req, res) => {
