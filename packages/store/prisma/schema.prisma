@@ -19,8 +19,8 @@ model Website {
   id        String        @id @default(uuid())
   url       String
   timeAdded DateTime      @default(now())
-  User      User?         @relation(references: [id], fields: [userId])
-  userId    String?
+  User      User          @relation(references: [id], fields: [userId])
+  userId    String
   ticks     WebsiteTick[]
 }
 
@@ -36,8 +36,9 @@ model WebsiteTick {
   status           WebsiteStatus
   Website          Website?      @relation(fields: [websiteId], references: [id])
   websiteId        String?
-  Region           Region?       @relation(fields: [regionId], references: [id])
-  regionId         String?
+  Region           Region        @relation(fields: [regionId], references: [id])
+  regionId         String
+  createdAt        DateTime      @default(now())
 }
 
 enum WebsiteStatus {
