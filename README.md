@@ -308,3 +308,55 @@ model Like {
 - ✅ Join tables for metadata storage
 
 ### Reference: [ChatGPT Learning Thread](https://chatgpt.com/c/6884d94b-cadc-8011-99b3-904b6909db2a)
+
+```dockerfile
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY ./package.json ./package.json
+COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
+COPY ./pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY ./turbo.json ./turbo.json
+COPY ./packages ./packages
+COPY ./apps/http-backend/ ./apps/http-backend/
+
+RUN pnpm install --frozen-lockfile
+
+RUN pnpm db:generate
+RUN pnpm build
+
+FROM node:24-alpine AS runner
+
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+COPY ./package.json ./package.json
+COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
+COPY ./pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY ./turbo.json ./turbo.json
+COPY ./packages ./packages
+COPY ./apps/http-backend/package.json ./apps/http-backend/package.json
+
+RUN pnpm install --prod --frozen-lockfile
+
+COPY --from=builder --chown=nodejs:nodejs /app/apps/http-backend/dist ./apps/http-backend/dist
+COPY --from=builder --chown=nodejs:nodejs /app/packages/db ./packages/db
+COPY --from=builder --chown=nodejs:nodejs /app/apps/http-backend/node_modules/@repo/db ./apps/http-backend/node_modules/@repo/db
+
+RUN pnpm store prune
+
+USER nodejs
+
+EXPOSE 4000
+
+ENV NODE_ENV=production
+
+CMD ["pnpm", "start:backend"]
+```
