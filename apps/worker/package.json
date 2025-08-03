@@ -9,6 +9,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "redis": "^5.7.0"
+    "store": "*",
+    "redisstream":"*"
   }
 }
