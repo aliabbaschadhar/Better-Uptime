@@ -5,13 +5,21 @@ const client = await createClient()
   .connect();
 
 
+const STREAM_NAME = "betteruptime:website"
 type WebsiteEvent = { url: string, id: string }
+type MessageType = {
+  id: string,
+  message: {
+    url: string,
+    id: string
+  }
+}
 
 
 async function xAdd({ url, id }: WebsiteEvent) {
   try {
     await client.xAdd(
-      "betteruptime:website", "*", {
+      STREAM_NAME, "*", {
       url,
       id
     });
@@ -42,7 +50,7 @@ export async function xAddBulkPipeline(websites: WebsiteEvent[]) {
 
   // Add each website event to the Redis stream in the pipeline queue
   for (const { url, id } of websites) {
-    pipeline.xAdd("betteruptime:website", "*", { url, id })
+    pipeline.xAdd(STREAM_NAME, "*", { url, id })
   }
 
   try {
@@ -55,4 +63,29 @@ export async function xAddBulkPipeline(websites: WebsiteEvent[]) {
     console.error("Failed to add events to Redis stream in bulk:", err)
     throw err;
   }
+}
+
+export async function xReadGroup(consumerGroup: string, workerId: string): Promise<MessageType[]> {
+  const res = await client.xReadGroup(
+    consumerGroup,
+    workerId,
+    {
+      key: STREAM_NAME,
+      id: ">"
+    }, {
+    COUNT: 5
+  }
+  )
+
+  if (!res) {
+    throw new Error("Response is empty!")
+  }
+  //@ts-ignore
+  let messages: MessageType[] = res?.[0]?.messages ?? [];
+  console.log(messages)
+  return res
+}
+
+export async function xAck(consumerGroup: string, eventId: string) {
+  const res = await client.xAck(STREAM_NAME, consumerGroup, eventId)
 }
