@@ -81,6 +81,8 @@
     "apps/worker": {
       "name": "worker",
       "dependencies": {
+        "@types/axios": "^0.14.4",
+        "axios": "^1.11.0",
         "redisstream": "*",
         "store": "*",
       },

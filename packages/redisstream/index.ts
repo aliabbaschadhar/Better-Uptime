@@ -65,7 +65,7 @@ export async function xAddBulkPipeline(websites: WebsiteEvent[]) {
   }
 }
 
-export async function xReadGroup(consumerGroup: string, workerId: string): Promise<MessageType[]> {
+export async function xReadGroup(consumerGroup: string, workerId: string): Promise<MessageType[] | undefined> {
   const res = await client.xReadGroup(
     consumerGroup,
     workerId,
@@ -73,7 +73,7 @@ export async function xReadGroup(consumerGroup: string, workerId: string): Promi
       key: STREAM_NAME,
       id: ">"
     }, {
-    COUNT: 5
+    COUNT: 10
   }
   )
 
@@ -81,11 +81,15 @@ export async function xReadGroup(consumerGroup: string, workerId: string): Promi
     throw new Error("Response is empty!")
   }
   //@ts-ignore
-  let messages: MessageType[] = res?.[0]?.messages ?? [];
+  let messages: MessageType[] | undefined = res?.[0]?.messages ?? [];
   console.log(messages)
-  return res
+  return messages
 }
 
 export async function xAck(consumerGroup: string, eventId: string) {
-  const res = await client.xAck(STREAM_NAME, consumerGroup, eventId)
+  await client.xAck(STREAM_NAME, consumerGroup, eventId)
+}
+
+export async function bulkXAck(consumerGroup: string, eventIds: string[]) {
+  Promise.all(eventIds.map((eventId) => xAck(consumerGroup, eventId)))
 }

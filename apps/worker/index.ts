@@ -1,6 +1,7 @@
 import axios from "axios"
-import { xAck, xReadGroup } from "redisstream/client"
+import { bulkXAck, xAck, xReadGroup } from "redisstream/client"
 import { prismaClient } from "store/client"
+import { promise } from "zod"
 
 const REGION_ID = String(process.env.REGION_ID)
 const WORKER_ID = String(process.env.WORKER_ID)
@@ -12,21 +13,29 @@ if (!REGION_ID) throw new Error("Region doesn't exists")
 if (!WORKER_ID) throw new Error("Worker Id does not exists")
 
 async function main() {
-  // while (true) {
-  //read from the stream
-  const response = await xReadGroup(REGION_ID, WORKER_ID)
+  while (true) {
+    //read from the stream
+    const response = await xReadGroup(REGION_ID, WORKER_ID)
+
+    if (!response) {
+      console.log("Response not found")
+      continue;
+    }
+
+    const redisStreamIdsList = response.map(({ id }) => id) // Map will return the array
 
 
-  let promises = response.map(({ id, message }) => fetchWebsites(message.url, message.id))
-  await Promise.all(promises)
+    let promises = response.map(({ id, message }) => fetchWebsites(message.url, message.id))
+    await Promise.all(promises)
+    console.log(promises.length)
 
 
-  // process the website and store the result in the DB. 
-  // todo: It should be routed through a queue in a bulk DB request
+    // process the website and store the result in the DB. 
+    // todo: It should be routed through a queue in a bulk DB request
 
-  // Ack back to the queue that his event has been processed
-  xAck(REGION_ID, "aldfjlaja")
-  // }
+    // Ack back to the queue that his event has been processed
+    bulkXAck(REGION_ID, redisStreamIdsList)
+  }
 
 }
 
