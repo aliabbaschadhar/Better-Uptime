@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} antialiased bg-background text-white selection:bg-primary selection:text-white`}>
         {children}
+        <Toaster />
       </body>
     </html>
   );
