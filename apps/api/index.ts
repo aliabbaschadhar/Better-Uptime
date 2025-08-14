@@ -40,12 +40,12 @@ app.post("/user/signup", async (req, res) => {
     return;
   }
 
-  const { username, password } = parsedData.data;
+  const { email, password } = parsedData.data;
 
   // Check if the user already exists
   const existingUser = await prismaClient.user.findUnique({
     where: {
-      username: username,
+      email: email,
     },
   });
 
@@ -60,7 +60,7 @@ app.post("/user/signup", async (req, res) => {
     const user = await prismaClient.user.create({
       data: {
         password,
-        username,
+        email,
       },
     });
 
@@ -91,7 +91,7 @@ app.post("/user/signin", async (req, res) => {
 
   const user = await prismaClient.user.findFirst({
     where: {
-      username: parsedData.data.username,
+      email: parsedData.data.email,
     },
   });
 

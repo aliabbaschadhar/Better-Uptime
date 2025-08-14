@@ -31,12 +31,23 @@ type FormValues = z.infer<typeof schema>;
 export default function SignUpPage() {
   const [isPending, startTransition] = useTransition();
   const [subError, setSubError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
     mode: 'onTouched',
   });
+
+  const handleGoogleSignUp = () => {
+    setIsLoading(true);
+    // Placeholder for Google OAuth implementation
+    toast({
+      title: 'Google Sign Up',
+      description: 'Google OAuth integration coming soon!'
+    });
+    setTimeout(() => setIsLoading(false), 1000);
+  };
 
   async function onSubmit(values: FormValues) {
     setSubError(null);
@@ -64,30 +75,28 @@ export default function SignUpPage() {
     <div className="flex w-full items-center justify-center">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-600/15 ring-1 ring-rose-600/30">
-            <ShieldPlus className="h-6 w-6 text-rose-500" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-500/20 ring-1 ring-rose-400/40 shadow-lg shadow-rose-500/25">
+            <ShieldPlus className="h-6 w-6 text-rose-400" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Create your account</h1>
-          <p className="text-sm text-gray-400">Start monitoring with Better-Uptime</p>
+          <p className="text-sm text-rose-100/70">Get started with Better-Uptime monitoring</p>
         </div>
         <div className="relative">
-          {/* Pinkish glow behind the card */}
-          <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[28px] bg-[radial-gradient(60%_60%_at_30%_10%,rgba(244,63,94,0.20),transparent_70%)] blur-2xl" />
-          <div className="rounded-2xl border border-rose-200/10 bg-[linear-gradient(135deg,rgba(244,63,94,0.10),rgba(17,24,39,0.85))] shadow-2xl backdrop-blur-sm">
+          {/* Enhanced pinkish glow behind the card */}
+          <div className="pointer-events-none absolute -inset-8 -z-10 rounded-[32px] bg-[radial-gradient(70%_70%_at_30%_10%,rgba(244,63,94,0.25),transparent_70%)] blur-2xl" />
+          <div className="rounded-2xl border border-rose-300/20 bg-[linear-gradient(135deg,rgba(244,63,94,0.15),rgba(236,72,153,0.1),rgba(17,24,39,0.9))] shadow-2xl backdrop-blur-sm ring-1 ring-rose-400/10">
             <div className="px-6 pt-6">
               <h2 className="text-lg font-semibold text-white">Sign up</h2>
-              <p className="text-sm text-gray-400">Use a unique email and a strong password</p>
+              <p className="text-sm text-rose-100/60">Create your Better-Uptime account</p>
             </div>
             <div className="px-6 pb-6 pt-4">
               {/* Google OAuth Button */}
               <Button
                 type="button"
                 variant="outline"
-                className="w-full rounded-lg border border-gray-700 bg-white/5 text-white hover:bg-white/10 hover:scale-105 transition-all duration-200"
-                onClick={() => {
-                  // TODO: Implement Google OAuth
-                  toast({ title: 'Coming soon', description: 'Google sign-up will be available soon.' });
-                }}
+                className="w-full rounded-lg border border-rose-300/30 bg-white/5 text-white hover:bg-rose-500/10 hover:border-rose-300/50 hover:scale-[1.02] transition-all duration-200 backdrop-blur-sm"
+                onClick={handleGoogleSignUp}
+                disabled={isLoading}
               >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
@@ -113,10 +122,10 @@ export default function SignUpPage() {
               {/* Divider */}
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-gray-700" />
+                  <span className="w-full border-t border-rose-300/20" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-gray-900 px-2 text-gray-400">Or continue with email</span>
+                  <span className="bg-gray-900 px-2 text-rose-100/60">Or continue with email</span>
                 </div>
               </div>
 
@@ -127,16 +136,16 @@ export default function SignUpPage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Email</FormLabel>
+                        <FormLabel className="text-rose-100">Email</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
-                              placeholder="you"
+                              placeholder="you@example.com"
                               autoComplete="email"
                               {...field}
-                              className="pl-9 rounded-lg border border-gray-700 bg-transparent placeholder:text-gray-500 focus-visible:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500"
+                              className="pl-9 rounded-lg border border-rose-300/30 bg-gray-800/60 text-white placeholder:text-rose-100/40 focus-visible:border-rose-400 focus-visible:ring-2 focus-visible:ring-rose-400/30 transition-all duration-200 hover:border-rose-300/50"
                             />
-                            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+                            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-rose-300">@</span>
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -149,14 +158,14 @@ export default function SignUpPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Password</FormLabel>
+                        <FormLabel className="text-rose-100">Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="••••••••"
                             autoComplete="new-password"
                             {...field}
-                            className="rounded-lg border border-gray-700 bg-transparent placeholder:text-gray-500 focus-visible:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500"
+                            className="rounded-lg border border-rose-300/30 bg-gray-800/60 text-white placeholder:text-rose-100/40 focus-visible:border-rose-400 focus-visible:ring-2 focus-visible:ring-rose-400/30 transition-all duration-200 hover:border-rose-300/50"
                           />
                         </FormControl>
                         <FormMessage />
@@ -170,10 +179,10 @@ export default function SignUpPage() {
 
                   <Button
                     type="submit"
-                    className="w-full rounded-lg bg-gradient-to-r from-rose-500 to-rose-700 text-white transition-transform duration-200 hover:scale-105 hover:from-rose-500 hover:to-rose-600"
+                    className="w-full rounded-lg bg-gradient-to-r from-rose-500 to-pink-600 text-white transition-all duration-200 hover:scale-[1.02] hover:from-rose-400 hover:to-pink-500 focus:ring-2 focus:ring-rose-400/50 shadow-lg shadow-rose-500/25"
                     disabled={isPending}
                   >
-                    {isPending ? 'Creating…' : 'Create account'}
+                    {isPending ? 'Creating account…' : 'Create account'}
                   </Button>
 
                   <p className="text-center text-sm text-gray-400">

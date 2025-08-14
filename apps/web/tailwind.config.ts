@@ -113,6 +113,10 @@ const config: Config = {
         'fade-in': 'fade-in 0.6s ease-out',
         'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
       },
+      fontFamily: {
+        grotesk: ['"Space Grotesk"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        sans: ['"Space Grotesk"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif']
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

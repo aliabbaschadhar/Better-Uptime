@@ -1,9 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NODE_ENV === 'production'
@@ -58,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} antialiased bg-background text-white selection:bg-primary selection:text-white`}>
+      <body className={`${spaceGrotesk.className} antialiased bg-background text-white selection:bg-primary selection:text-white`}>
         {children}
         <Toaster />
       </body>
