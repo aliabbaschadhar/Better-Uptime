@@ -71,7 +71,7 @@ app.post("/user/signup", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(403).send({
-      message: "Error Occured in creating User",
+      message: "Error Occurred in creating User",
     });
   }
 })
